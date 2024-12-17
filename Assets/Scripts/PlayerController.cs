@@ -4,7 +4,11 @@ public class PlayerController : MonoBehaviour
 {
     private PlayerControls controls;
     private Rigidbody rb;
+    
+    [Header("Camera Settings")]
     private GameObject cam;
+    [SerializeField] private float fovCamera = 10;
+    private float defaultFovCamera;
 
     [Header("Sensitivity Settings")]
     [SerializeField] private float mouseSensitivity = 300;
@@ -19,6 +23,13 @@ public class PlayerController : MonoBehaviour
     private bool isSliding = false, isSprinting = false, isMoving = false;
     private Vector3 direcctionToSlide;
 
+
+    public float smoothTime = 0.1f; // Tiempo de suavizado (ajusta para más o menos fluidez)
+
+    private Vector2 currentLook; // Almacena la posición de rotación actual
+    private Vector2 currentLookVelocity; // Velocidad de cambio de rotación
+
+
     private void Awake() { controls = new PlayerControls(); }
     private void OnEnable() { controls.Enable(); }
     private void OnDisable() { controls.Disable(); }
@@ -27,6 +38,7 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         rb = this.gameObject.GetComponent<Rigidbody>();
         cam = GameObject.FindGameObjectWithTag("MainCamera");
+        defaultFovCamera = cam.GetComponent<Camera>().fieldOfView;
         speed = defaultSpeed;
     }
     private void Update()
@@ -41,15 +53,15 @@ public class PlayerController : MonoBehaviour
     private void HandleMouseLook()
     {
         Vector2 look = controls.Player.Look.ReadValue<Vector2>();
-        float mouseX = look.x * mouseSensitivity * Time.deltaTime;
-        float mouseY = look.y * mouseSensitivity * Time.deltaTime;
+        look *= mouseSensitivity * Time.deltaTime;
 
-        xRotation -= mouseY;
+        currentLook = Vector2.SmoothDamp(currentLook, look, ref currentLookVelocity, smoothTime * 0.75f);
+
+        xRotation -= currentLook.y;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
         cam.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-
-        transform.Rotate(Vector3.up * mouseX);
+        transform.Rotate(Vector3.up * currentLook.x);
     }
     private void HandleMovement()
     {
@@ -92,6 +104,7 @@ public class PlayerController : MonoBehaviour
                 StopSliding();
             else
                 rb.MovePosition(rb.position + direcctionToSlide * slideSpeed * Time.deltaTime);
+
         }
         else
         {
@@ -107,8 +120,7 @@ public class PlayerController : MonoBehaviour
         direcctionToSlide = this.gameObject.transform.forward;
         // Aquí puedes activar la animación del deslizamiento si tienes alguna
         // Ejemplo: animator.SetTrigger("Slide");
-
-
+        cam.GetComponent<Camera>().fieldOfView = defaultFovCamera + fovCamera;
         // Opcional: aplicar efectos de sonido o partículas si lo deseas.
     }
     private void StopSliding()
@@ -117,6 +129,7 @@ public class PlayerController : MonoBehaviour
 
         // Aquí puedes detener la animación del deslizamiento
         // Ejemplo: animator.ResetTrigger("Slide");
+        cam.GetComponent<Camera>().fieldOfView = defaultFovCamera;
 
         // Opcional: aplicar efectos de sonido o partículas al terminar el deslizamiento.
     }
