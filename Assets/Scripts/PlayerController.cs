@@ -1,4 +1,3 @@
-
 using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
@@ -7,8 +6,9 @@ public class PlayerController : MonoBehaviour
     
     [Header("Camera Settings")]
     private GameObject cam;
-    [SerializeField] private float fovCamera = 10;
+    [SerializeField] private float fovCamera = 10, smoothTime = 0.1f;
     private float defaultFovCamera;
+    private Vector2 currentLook, currentLookVelocity;
 
     [Header("Sensitivity Settings")]
     [SerializeField] private float mouseSensitivity = 300;
@@ -22,13 +22,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float slideSpeed = 10f, slideDuration = 1f, cooldownTime = 0f, slideTime = 0f, slideCooldown = 0.5f;
     private bool isSliding = false, isSprinting = false, isMoving = false;
     private Vector3 direcctionToSlide;
-
-
-    public float smoothTime = 0.1f; // Tiempo de suavizado (ajusta para más o menos fluidez)
-
-    private Vector2 currentLook; // Almacena la posición de rotación actual
-    private Vector2 currentLookVelocity; // Velocidad de cambio de rotación
-
 
     private void Awake() { controls = new PlayerControls(); }
     private void OnEnable() { controls.Enable(); }
