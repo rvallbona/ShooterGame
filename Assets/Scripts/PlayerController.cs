@@ -6,20 +6,21 @@ public class PlayerController : MonoBehaviour
     
     [Header("Camera Settings")]
     private GameObject cam;
-    [SerializeField] private float fovCamera = 10, smoothTime = 0.1f;
+    [SerializeField] private float fovCamera = 20, smoothTime = 0.1f;
     private float defaultFovCamera;
     private Vector2 currentLook, currentLookVelocity;
 
     [Header("Sensitivity Settings")]
-    [SerializeField] private float mouseSensitivity = 300;
+    [SerializeField] private float mouseSensitivity = 100;
 
     [Header("Movement Settings")]
     private float xRotation = 0f;
 
     private float speed;
-    [SerializeField] private float defaultSpeed = 5f, sprintAcceleration = 5f, maxSprintSpeed = 1.5f;
+    [SerializeField] private float defaultSpeed = 5f, sprintAcceleration = 5f, maxSprintSpeed = 1.5f, jumpForce = 10f;
 
-    [SerializeField] private float slideSpeed = 10f, slideDuration = 1f, cooldownTime = 0f, slideTime = 0f, slideCooldown = 0.5f;
+    [SerializeField] private float slideSpeed = 10f, slideDuration = 1f, cooldownSlideTime = 0f, slideTime = 0f, slideCooldown = 0.5f;
+    [SerializeField] private float sprintDuration = 1f, cooldownSprintTime = 0f, sprintTime = 0f, sprintCooldown = 0.5f;
     private bool isSliding = false, isSprinting = false, isMoving = false;
     private Vector3 direcctionToSlide;
 
@@ -70,25 +71,58 @@ public class PlayerController : MonoBehaviour
     private void JumpLogic()
     {
         if (controls.Player.Jump.WasPressedThisFrame())
-            Debug.Log("Jump");
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
     private void SprintLogic()
     {
         float sprintSpeed = defaultSpeed * maxSprintSpeed;
-        if (controls.Player.Sprint.IsPressed() && isMoving)
+        if (controls.Player.Sprint.WasPressedThisFrame() && !isSprinting && cooldownSprintTime <= 0f && isMoving)
+            StartSprinting();
+
+        if (isSprinting)
         {
-            isSprinting = true;
-            speed = Mathf.MoveTowards(speed, sprintSpeed, sprintAcceleration * Time.deltaTime);
+            sprintTime += Time.deltaTime;
+            if (sprintTime >= sprintDuration)
+                StopSprinting();
+            else
+            {
+                isSprinting = true;
+                float fovSprintCamera = fovCamera * .5f;
+                cam.GetComponent<Camera>().fieldOfView = defaultFovCamera + fovSprintCamera;
+                speed = Mathf.MoveTowards(speed, sprintSpeed, sprintAcceleration * Time.deltaTime);
+            }
         }
         else
         {
-            isSprinting = false;
-            speed = Mathf.MoveTowards(speed, defaultSpeed, sprintAcceleration * Time.deltaTime);
+            if (cooldownSprintTime > 0f)
+                cooldownSprintTime -= Time.deltaTime;
         }
+    }
+    private void StartSprinting()
+    {
+        isSprinting = true;
+        sprintTime = 0f;
+        cooldownSprintTime = sprintCooldown;
+
+        // Aquí puedes activar la animación del deslizamiento si tienes alguna
+        // Ejemplo: animator.SetTrigger("Slide");
+
+        // Opcional: aplicar efectos de sonido o partículas si lo deseas.
+    }
+    private void StopSprinting()
+    {
+        isSprinting = false;
+        cam.GetComponent<Camera>().fieldOfView = defaultFovCamera;
+        speed = Mathf.MoveTowards(speed, defaultSpeed, sprintAcceleration * Time.deltaTime);
+
+        // Aquí puedes detener la animación del deslizamiento
+        // Ejemplo: animator.ResetTrigger("Slide");
+
+        // Opcional: aplicar efectos de sonido o partículas al terminar el deslizamiento.
     }
     private void SlideLogic()
     {
-        if (controls.Player.Slide.WasPressedThisFrame() && !isSliding && cooldownTime <= 0f && isSprinting)
+        if (controls.Player.Slide.WasPressedThisFrame() && !isSliding && cooldownSlideTime <= 0f && isSprinting)
             StartSliding();
         if (isSliding)
         {
@@ -101,15 +135,15 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            if (cooldownTime > 0f)
-                cooldownTime -= Time.deltaTime;
+            if (cooldownSlideTime > 0f)
+                cooldownSlideTime -= Time.deltaTime;
         }
     }
     private void StartSliding()
     {
         isSliding = true;
         slideTime = 0f;
-        cooldownTime = slideCooldown;
+        cooldownSlideTime = slideCooldown;
         direcctionToSlide = this.gameObject.transform.forward;
         // Aquí puedes activar la animación del deslizamiento si tienes alguna
         // Ejemplo: animator.SetTrigger("Slide");
