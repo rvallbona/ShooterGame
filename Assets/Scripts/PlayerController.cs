@@ -2,7 +2,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     private PlayerControls controls;
-    private Rigidbody rb;
+    private CharacterController characterController;
     
     [Header("Camera Settings")]
     private GameObject cam;
@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 currentLook, currentLookVelocity;
 
     [Header("Sensitivity Settings")]
-    [SerializeField] private float mouseSensitivity = 100;
+    [SerializeField] private float mouseSensitivity = 50;
 
     [Header("Movement Settings")]
     private float xRotation = 0f;
@@ -24,13 +24,16 @@ public class PlayerController : MonoBehaviour
     private bool isSliding = false, isSprinting = false, isMoving = false;
     private Vector3 direcctionToSlide;
 
+    private Vector3 velocity; // Para manejar la gravedad y el salto
+    [SerializeField] private float gravity = -9.81f;
+
     private void Awake() { controls = new PlayerControls(); }
     private void OnEnable() { controls.Enable(); }
     private void OnDisable() { controls.Disable(); }
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
-        rb = this.gameObject.GetComponent<Rigidbody>();
+        characterController = this.gameObject.GetComponent<CharacterController>();
         cam = GameObject.FindGameObjectWithTag("MainCamera");
         defaultFovCamera = cam.GetComponent<Camera>().fieldOfView;
         speed = defaultSpeed;
@@ -66,12 +69,11 @@ public class PlayerController : MonoBehaviour
             isMoving = false;
         Vector3 moveDirection = transform.right * move.x + transform.forward * move.y;
         if (!isSliding)
-            transform.position += moveDirection * speed * Time.deltaTime;
+            characterController.Move(moveDirection * speed * Time.deltaTime);
     }
     private void JumpLogic()
     {
-        if (controls.Player.Jump.WasPressedThisFrame())
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
     }
     private void SprintLogic()
     {
@@ -129,8 +131,8 @@ public class PlayerController : MonoBehaviour
             slideTime += Time.deltaTime;
             if (slideTime >= slideDuration)
                 StopSliding();
-            else
-                rb.MovePosition(rb.position + direcctionToSlide * slideSpeed * Time.deltaTime);
+            //else { }
+                //rb.MovePosition(rb.position + direcctionToSlide * slideSpeed * Time.deltaTime);
 
         }
         else
@@ -148,6 +150,7 @@ public class PlayerController : MonoBehaviour
         // Aquí puedes activar la animación del deslizamiento si tienes alguna
         // Ejemplo: animator.SetTrigger("Slide");
         cam.GetComponent<Camera>().fieldOfView = defaultFovCamera + fovCamera;
+        //gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y / 2, gameObject.transform.position.z);
         // Opcional: aplicar efectos de sonido o partículas si lo deseas.
     }
     private void StopSliding()
@@ -157,6 +160,7 @@ public class PlayerController : MonoBehaviour
         // Aquí puedes detener la animación del deslizamiento
         // Ejemplo: animator.ResetTrigger("Slide");
         cam.GetComponent<Camera>().fieldOfView = defaultFovCamera;
+        //gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y * 2, gameObject.transform.position.z);
 
         // Opcional: aplicar efectos de sonido o partículas al terminar el deslizamiento.
     }

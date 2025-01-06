@@ -323,6 +323,17 @@
                 },
                 {
                     "name": "",
+                    "id": "466de2fc-5a91-4c82-bed1-cc34af7b5c47",
+                    "path": "<DualShockGamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Slide",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "2de22ae1-905b-4aad-841a-e586f45ffda8",
                     "path": "<Keyboard>/shift",
                     "interactions": "",

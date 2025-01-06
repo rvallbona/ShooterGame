@@ -202,7 +202,7 @@ GameObject:
   - component: {fileID: 50876941}
   - component: {fileID: 50876940}
   - component: {fileID: 50876939}
-  - component: {fileID: 50876938}
+  - component: {fileID: 50876944}
   - component: {fileID: 50876943}
   m_Layer: 0
   m_Name: Player
@@ -211,33 +211,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!54 &50876938
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 50876936}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 112
-  m_CollisionDetection: 0
 --- !u!136 &50876939
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -340,17 +313,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89b6821878ff49446ab1275baa0b7418, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseSensitivity: 300
+  fovCamera: 20
+  smoothTime: 0.1
+  mouseSensitivity: 100
   defaultSpeed: 5
   sprintAcceleration: 5
   maxSprintSpeed: 1.5
+  jumpForce: 2
   slideSpeed: 10
   slideDuration: 1
-  cooldownTime: 0
+  cooldownSlideTime: 0
   slideTime: 0
   slideCooldown: 0.5
-  isSliding: 0
-  isSprinting: 0
+  sprintDuration: 1
+  cooldownSprintTime: 0
+  sprintTime: 0
+  sprintCooldown: 0.5
+  gravity: -9.81
+--- !u!143 &50876944
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 50876936}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &441598483
 GameObject:
   m_ObjectHideFlags: 0
